@@ -139,7 +139,63 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    raise NotImplementedError
+
+    p = 1.0
+
+    print("people", people, flush=True)
+    print("one_gene", one_gene, flush=True)
+    print("two_genes", two_genes, flush=True)
+    print("have_trait", have_trait, flush=True)
+
+
+    for person in people:
+        mother = people[person]["mother"]
+        father = people[person]["father"]
+
+        # Determine number of genes
+        if person in two_genes:
+            genes = 2
+        elif person in one_gene:
+            genes = 1
+        else:
+            genes = 0
+
+        # Determine trait
+        has_trait = person in have_trait
+
+        # Calculate probability
+        if mother is None and father is None:
+            # No parents information
+            gene_prob = PROBS["gene"][genes]
+        else:
+            # With parents information
+            # Calculate probability of inheriting gene from each parent
+            def parent_pass_gene_prob(parent):
+                if parent in two_genes:
+                    print("parent", parent, "passes gene with prob", 1 - PROBS["mutation"], flush=True)
+                    return 1 - PROBS["mutation"]        
+                elif parent in one_gene:
+                    return 0.5
+                else:
+                    return PROBS["mutation"]
+                
+            mother_prob = parent_pass_gene_prob(mother)
+            father_prob = parent_pass_gene_prob(father)
+
+            if genes == 2:
+                gene_prob = mother_prob * father_prob
+            elif genes == 1:
+                gene_prob = mother_prob * (1 - father_prob) + (1 - mother_prob) * father_prob
+            else:
+                gene_prob = (1 - mother_prob) * (1 - father_prob)
+
+        trait_prob = PROBS["trait"][genes][has_trait]
+
+        p *= gene_prob * trait_prob
+
+    return p
+
+    # raise NotImplementedError
 
 
 def update(probabilities, one_gene, two_genes, have_trait, p):
@@ -161,4 +217,13 @@ def normalize(probabilities):
 
 
 if __name__ == "__main__":
-    main()
+    people = {
+        "Harry": {"name": "Harry", "mother": None, "father": None, "trait": None}
+    }
+    one_gene = {"Harry"}
+    two_genes = set()
+    have_trait = {"Harry"}
+
+    from heredity import PROBS
+    print(joint_probability(people, one_gene, two_genes, have_trait))
+
