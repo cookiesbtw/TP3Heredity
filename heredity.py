@@ -205,7 +205,27 @@ def update(probabilities, one_gene, two_genes, have_trait, p):
     Which value for each distribution is updated depends on whether
     the person is in `have_gene` and `have_trait`, respectively.
     """
-    raise NotImplementedError
+
+    for person in probabilities:
+        # Determine number of genes
+        if person in two_genes:
+            genes = 2
+        elif person in one_gene:
+            genes = 1
+        else:
+            genes = 0
+
+        # Determine trait
+        has_trait = person in have_trait
+
+        # Update probabilities
+        probabilities[person]["gene"][genes] += p
+        probabilities[person]["trait"][has_trait] += p
+
+    print("Updated probabilities:", probabilities, flush=True)
+    
+
+    # raise NotImplementedError
 
 
 def normalize(probabilities):
@@ -216,14 +236,49 @@ def normalize(probabilities):
     raise NotImplementedError
 
 
+# AI generated test code
 if __name__ == "__main__":
+    PROBS = {
+        "gene": {2: 0.01, 1: 0.03, 0: 0.96},
+        "trait": {
+            2: {True: 0.65, False: 0.35},
+            1: {True: 0.56, False: 0.44},
+            0: {True: 0.01, False: 0.99}
+        },
+        "mutation": 0.01
+    }
+
     people = {
         "Harry": {"name": "Harry", "mother": None, "father": None, "trait": None}
     }
+
     one_gene = {"Harry"}
     two_genes = set()
     have_trait = {"Harry"}
 
-    from heredity import PROBS
-    print(joint_probability(people, one_gene, two_genes, have_trait))
+    # Dicionário inicial de probabilidades
+    probabilities = {
+        "Harry": {
+            "gene": {2: 0, 1: 0, 0: 0},
+            "trait": {True: 0, False: 0}
+        }
+    }
+
+    # 1️⃣ Calcular probabilidade conjunta
+    p = joint_probability(people, one_gene, two_genes, have_trait)
+    print("\nJoint probability p =", p)
+
+    # 2️⃣ Mostrar antes do update
+    print("\nBefore update:")
+    for person in probabilities:
+        print(f"{person}: {probabilities[person]}")
+
+    # 3️⃣ Atualizar distribuição
+    update(probabilities, one_gene, two_genes, have_trait, p)
+
+    # 4️⃣ Mostrar depois do update
+    print("\nAfter update:")
+    for person in probabilities:
+        print(f"{person}: {probabilities[person]}")
+
 
