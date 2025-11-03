@@ -233,7 +233,20 @@ def normalize(probabilities):
     Update `probabilities` such that each probability distribution
     is normalized (i.e., sums to 1, with relative proportions the same).
     """
-    raise NotImplementedError
+
+    for person in probabilities:
+        # Normalize gene probabilities
+        gene_total = sum(probabilities[person]["gene"].values())
+        for gene in probabilities[person]["gene"]:
+            probabilities[person]["gene"][gene] /= gene_total
+
+        # Normalize trait probabilities
+        trait_total = sum(probabilities[person]["trait"].values())
+        for trait in probabilities[person]["trait"]:
+            probabilities[person]["trait"][trait] /= trait_total
+
+
+    #raise NotImplementedError
 
 
 # AI generated test code
@@ -256,7 +269,6 @@ if __name__ == "__main__":
     two_genes = set()
     have_trait = {"Harry"}
 
-    # Dicionário inicial de probabilidades
     probabilities = {
         "Harry": {
             "gene": {2: 0, 1: 0, 0: 0},
@@ -280,5 +292,14 @@ if __name__ == "__main__":
     print("\nAfter update:")
     for person in probabilities:
         print(f"{person}: {probabilities[person]}")
+
+    # 5️⃣ Normalizar
+    normalize(probabilities)
+
+    # 6️⃣ Mostrar depois de normalizar
+    print("\nAfter normalization:")
+    for person in probabilities:
+        print(f"{person}: {probabilities[person]}")
+
 
 
